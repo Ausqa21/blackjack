@@ -39,4 +39,12 @@ public class Player {
                 .mapToInt(Card::getValue)
                 .sum();
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "username='" + username + '\'' +
+                ", dealtCards=" + dealtCards +
+                '}';
+    }
 }
