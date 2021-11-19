@@ -13,10 +13,10 @@ public class Deck {
 
     public Deck() {
         this.generate();
-        System.out.println("=== Creating a deck ===");
     }
 
     public void generate() {
+
         for (Suit suit: Suit.values()) {
             for (CardDetail cardDetail: CardDetail.values()) {
                 cards.add(new Card(cardDetail, suit));
@@ -30,15 +30,15 @@ public class Deck {
 
     public void shuffle() {
         Collections.shuffle(this.cards);
-        System.out.println("==== Shuffling Cards on Deck ====");
-        System.out.println(this.cards);
-        System.out.println("===== Shuffling Done ====");
     }
 
     public Card dealCard() {
-        System.out.println("=== Dealing Card ===");
         Card dealtCard = this.cards.get(this.cards.size() - 1);
         this.cards.remove(dealtCard);
         return dealtCard;
+    }
+
+    public List<Card> getCards() {
+        return List.copyOf(cards);
     }
 }
