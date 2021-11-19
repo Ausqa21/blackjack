@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.fail;
 
 @DisplayName("Bag Class Test")
@@ -20,32 +22,28 @@ public class DeckTest {
         this.deck = new Deck();
     }
 
-
     @Test
-    @DisplayName("Dealing first two cards on deck")
-    void testDealCard(){
-        deck.generate();
-//        deck.shuffle();
-        Card dealtCard = deck.dealCard();
-        System.out.println(dealtCard);
-        assertEquals(11, dealtCard.getValue());
-        assertEquals(51, deck.getSize());
-        assertEquals(10, deck.dealCard().getValue());
-        assertEquals(50, deck.getSize());
+    @DisplayName("Testing Generate Cards")
+    void testGenerate() {
+        assertEquals(52, deck.getSize());
     }
 
     @Test
     @DisplayName("Shuffling cards on deck")
     void testDeckShuffle(){
-        deck.generate();
+        List<Card> cards = deck.getCards();
         deck.shuffle();
-        assertEquals(52, deck.getSize());
+        List<Card> shuffledCards = deck.getCards();
+        assertNotEquals(cards.get(0),shuffledCards.get(0));
     }
 
+
     @Test
-    @DisplayName("Generating cards on deck")
-    void testDeckGeneration(){
+    @DisplayName("Dealing first two cards on deck")
+    void testDealCard() {
         deck.generate();
-        assertEquals(52, deck.getSize());
+        Card dealtCard = deck.dealCard();
+        assertEquals(11, dealtCard.getValue());
+        assertEquals(10, deck.dealCard().getValue());
     }
 }

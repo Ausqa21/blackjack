@@ -1,5 +1,7 @@
 package io.turntabl.domain;
 
+import io.turntabl.enums.StrategyType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,14 +10,15 @@ public class Player {
     // Attributes
     private String username;
     private List<Card> dealtCards;
-    private String strategy = "DEFAULT";
+    private final StrategyType strategy;
 
     public Player(String username) {
         this.username = username;
         this.dealtCards = new ArrayList<>();
+        this.strategy = StrategyType.DEFAULT;
     }
 
-    public Player(String username, String strategy) {
+    public Player(String username, StrategyType strategy) {
         this.username = username;
         this.dealtCards = new ArrayList<>();
         this.strategy = strategy;
@@ -37,7 +40,7 @@ public class Player {
         this.dealtCards = dealtCards;
     }
 
-    public String getStrategy() {
+    public StrategyType getStrategy() {
         return this.strategy;
     }
 
@@ -56,6 +59,7 @@ public class Player {
         return "Player{" +
                 "username='" + username + '\'' +
                 ", dealtCards=" + dealtCards +
+                ", strategy=" + strategy +
                 '}';
     }
 }

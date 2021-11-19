@@ -3,6 +3,7 @@ package io.turntabl;
 import io.turntabl.domain.Deck;
 import io.turntabl.domain.Player;
 import io.turntabl.domain.Strategy;
+import io.turntabl.enums.StrategyType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,56 +11,81 @@ import java.util.stream.Collectors;
 public class Game {
 
     // Attributes
-    static int numberOfPlayers = 3;
+    static Scanner scanner = new Scanner(System.in);
     static List<Player> players = new ArrayList<>();
     static boolean winnerNotFound = true;
-    static int sticksPerCurrentRound ;
+    static int sticksPerCurrentRound;
 
 
     public static void main(String[] args) {
-        int playerCount = 1;
-        while (playerCount <= numberOfPlayers) {
-            players.add(new Player(String.valueOf(playerCount)));
-            playerCount++;
+        System.out.println("Welcome to the game BlackJack, let's get you started!");
+
+        int playerTracker = 1;
+        for (int index = 0 ; index < args.length ; index++){
+            if (index % 2 == 1){
+                    players.add(new Player(String.valueOf(playerTracker),StrategyType.fromString(args[index])));
+                    playerTracker ++;
+            }
         }
 
-        System.out.println("Now, let the game begin!\n");
+        // Print of alert for shuffle algo selection
+        System.out.println("What shuffling algorithm would you like to be implemented?\n");
+        System.out.println("Enter:\n1. Riffle suffle\n2. Pharoah/Faro shuffle\n3. Default shuffle");
+
+        // Accept user input for shuffle algo selection
+        scanner.nextInt();
+
+        players.forEach(System.out::println);
+        System.out.println("\nNOW, LET THE GAME BEGIN!!\n");
 
         // Create a deck
+        System.out.println("Generating Deck...");
         Deck deck = new Deck();
 
         // Shuffle the deck
+        System.out.println("Shuffling Deck...");
         deck.shuffle();
 
         // Deal cards to players
         players.forEach(player -> {
+            System.out.printf("Dealing First Card for Player %s...%n", player.getUsername());
             player.addCard(deck.dealCard());
+            System.out.printf("Dealing Second Card for Player %s...%n", player.getUsername());
             player.addCard(deck.dealCard());
         });
 
+        // Print out every player's first 2 cards
+        players.forEach(System.out::println);
+
+        // Check for a winner or eliminated players
         checkGameStatistics();
 
-        while (winnerNotFound) {
-            // Check player statistics
-            checkGameStatistics();
 
+        while (winnerNotFound) {
             // Set number of sticks for this round
             sticksPerCurrentRound = 0;
 
             players.forEach(player -> {
-                if (Objects.equals(player.getStrategy(), "DEFAULT")) {
-                    System.out.printf("Player %s is implementing the DEFAULT strategy%n", player.getUsername());
-                    Strategy.defaultStrategy(player, deck);
+                System.out.printf("Player %s is implementing the %s strategy%n", player.getUsername(), player.getStrategy());
+                if (player.getStrategy() == StrategyType.DEFAULT) {
+                    String strategy = Strategy.defaultStrategy(player, deck);
+                    System.out.printf("Default Strategy choose : %s%n",strategy);
+                } else if (player.getStrategy() == StrategyType.ALWAYS_STICK) {
+                    Strategy.alwaysStickStrategy();
+                } else if (player.getStrategy() == StrategyType.ALWAYS_HIT) {
+                    Strategy.alwaysHitStrategy(player, deck);
                 }
-
-                checkGameStatistics();
             });
 
             if (players.size() == sticksPerCurrentRound) {
+                System.out.println("Winning by all stick");
                 Player winnerByStick = getWinnerByStick();
                 System.out.printf("Congratulations Player %s! You've won the game!%n", winnerByStick.getUsername());
                 break;
             }
+
+            // Check player statistics
+            checkGameStatistics();
         }
     }
 
@@ -88,6 +114,7 @@ public class Game {
         if (getWinningPlayer().isPresent()) {
             winnerNotFound = false;
             System.out.println(getWinningPlayer().get().getDealtCards());
+            System.out.println("Winning at exactly 21");
             System.out.printf("Congratulations, Player %s! You've won the game!%n", getWinningPlayer().get().getUsername());
         } else {
             Map<Boolean, List<Player>> partitionedItems = getPlayerStatistics();
@@ -102,6 +129,7 @@ public class Game {
 
             if (activePlayers.size() == 1) {
                 winnerNotFound = false;
+                System.out.println("Winning by default");
                 System.out.printf("Congratulations, Player %s! You've won the game!%n", activePlayers.get(0).getUsername());
             }
 
