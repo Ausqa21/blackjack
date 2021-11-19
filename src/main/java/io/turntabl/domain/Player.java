@@ -8,10 +8,17 @@ public class Player {
     // Attributes
     private String username;
     private List<Card> dealtCards;
+    private String strategy = "DEFAULT";
 
     public Player(String username) {
         this.username = username;
         this.dealtCards = new ArrayList<>();
+    }
+
+    public Player(String username, String strategy) {
+        this.username = username;
+        this.dealtCards = new ArrayList<>();
+        this.strategy = strategy;
     }
 
     public String getUsername() {
@@ -28,6 +35,10 @@ public class Player {
 
     public void setDealtCards(List<Card> dealtCards) {
         this.dealtCards = dealtCards;
+    }
+
+    public String getStrategy() {
+        return this.strategy;
     }
 
     public void addCard(Card card) {

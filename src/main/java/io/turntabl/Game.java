@@ -2,6 +2,7 @@ package io.turntabl;
 
 import io.turntabl.domain.Deck;
 import io.turntabl.domain.Player;
+import io.turntabl.domain.Strategy;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,7 +12,6 @@ public class Game {
     // Attributes
     static int numberOfPlayers = 3;
     static List<Player> players = new ArrayList<>();
-    static Scanner scanner = new Scanner(System.in);
     static boolean winnerNotFound = true;
     static int sticksPerCurrentRound ;
 
@@ -19,9 +19,7 @@ public class Game {
     public static void main(String[] args) {
         int playerCount = 1;
         while (playerCount <= numberOfPlayers) {
-            System.out.printf("Player %s, enter your username: ", playerCount);
-            String username = scanner.nextLine();
-            players.add(new Player(username));
+            players.add(new Player(String.valueOf(playerCount)));
             playerCount++;
         }
 
@@ -49,24 +47,34 @@ public class Game {
             sticksPerCurrentRound = 0;
 
             players.forEach(player -> {
-                System.out.printf("Player %s, wanna HIT or STICK? Enter \n1: HIT\n2: STICK\n3: SHOW CARDS\n", player.getUsername());
-                int input = scanner.nextInt();
-
-                if (input == 3) {
-                    System.out.println(player.getDealtCards());
-                    System.out.printf("Player %s, wanna HIT or STICK? Enter \n1: HIT\n2: STICK\n", player.getUsername());
-                    input = scanner.nextInt();
+                if (Objects.equals(player.getStrategy(), "DEFAULT")) {
+                    System.out.printf("Player %s is implementing the DEFAULT strategy%n", player.getUsername());
+                    Strategy.defaultStrategy(player, deck);
                 }
 
-                if (input == 1) {
-                    player.addCard(deck.dealCard());
-                } else if (input == 2) {
-                    sticksPerCurrentRound++;
-                }
                 checkGameStatistics();
             });
 
+            if (players.size() == sticksPerCurrentRound) {
+                Player winnerByStick = getWinnerByStick();
+                System.out.printf("Congratulations Player %s! You've won the game!%n", winnerByStick.getUsername());
+                break;
+            }
         }
+    }
+
+    public static void hit(Deck deck, Player player) {
+        player.addCard(deck.dealCard());
+    }
+
+    public static void stick() {
+        sticksPerCurrentRound++;
+    }
+
+    public static Player getWinnerByStick() {
+        return players.stream()
+                .max(Comparator.comparingInt(Player::getTotalCardValue))
+                .orElseThrow(RuntimeException::new);
     }
 
     static Map<Boolean, List<Player>> getPlayerStatistics(){
@@ -76,7 +84,7 @@ public class Game {
         return  players.stream().filter(player -> player.getTotalCardValue() == 21).findFirst();
     }
 
-    static void checkGameStatistics(){
+    public static void checkGameStatistics(){
         if (getWinningPlayer().isPresent()) {
             winnerNotFound = false;
             System.out.println(getWinningPlayer().get().getDealtCards());
@@ -85,8 +93,9 @@ public class Game {
             Map<Boolean, List<Player>> partitionedItems = getPlayerStatistics();
             List<Player> eliminatedPlayers = partitionedItems.get(true);
             eliminatedPlayers.forEach(player -> {
-                System.out.println(player.getDealtCards());
+                System.out.printf("Player %s total card value: %s%n", player.getUsername(), player.getTotalCardValue());
                 System.out.printf("Player %s has been eliminated%n", player.getUsername());
+                System.out.printf("Player %s's dealt cards: %s%n", player.getUsername(), player.getDealtCards());
             });
 
             List<Player> activePlayers = partitionedItems.get(false);
@@ -99,5 +108,4 @@ public class Game {
             players = activePlayers;
         }
     }
-
 }
