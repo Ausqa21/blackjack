@@ -8,7 +8,7 @@ To run this project, you will need to pass command line arguments representing p
 
 ```
 Example
---player always-stick --player always-hit --player default --player risk-calculator
+--player always-stick --player always-hit --player default
 ```
 
 
